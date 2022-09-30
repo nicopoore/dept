@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { getUserFavorites } from "../services/favorites";
+import { getUserFavorites } from "./favorites";
 const findRocket = (rockets, rocketId) =>
   rockets.find((rocket) => rocket.rocket_id === rocketId);
 const findFavorite = (favorites, flightNumber) =>
