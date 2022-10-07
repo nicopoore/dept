@@ -26,7 +26,6 @@ app.use(express.json());
 
 // Application routes
 app.use("/api", routes());
-app.get("/", (_, res) => res.json("HOLA"));
 
 const port = process.env.PORT || 3000;
 
