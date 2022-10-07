@@ -25,6 +25,5 @@ app.use((0, morgan_1.default)("common"));
 app.use(express_1.default.json());
 // Application routes
 app.use("/api", (0, index_1.default)());
-app.get("/", (_, res) => res.json("HOLA"));
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`App listening on port ${port}`));

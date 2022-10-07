@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.processLaunches = void 0;
 /* eslint-disable camelcase */
-const favorites_1 = require("../services/favorites");
+const favorites_1 = require("./favorites");
 const findRocket = (rockets, rocketId) => rockets.find((rocket) => rocket.rocket_id === rocketId);
 const findFavorite = (favorites, flightNumber) => favorites.find((favorite) => favorite.flight_number === flightNumber);
 const processLaunches = (userId, launches, rockets) => __awaiter(void 0, void 0, void 0, function* () {

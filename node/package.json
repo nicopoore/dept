@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "compile": "tsc && node dist/index.js",
-    "dev": "./node_modules/nodemon/bin/nodemon.js -e ts  --exec \"npm run compile\"",
-    "start": "./node_modules/nodemon/bin/nodemon.js -e ts  --exec \"npm run compile\"",
+    "dev": "nodemon -e ts  --exec \"npm run compile\"",
+    "start": "nodemon -e ts  --exec \"npm run compile\"",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prettier": "prettier . --ignore-path .gitignore",
     "format:check": "npm run prettier -- --check .",
@@ -18,7 +18,9 @@
     "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d ./src/database/app-data-source.ts"
   },
   "nodemonConfig": {
-    "ignore": ["dist/*"]
+    "ignore": [
+      "dist/*"
+    ]
   },
   "author": "",
   "license": "ISC",
