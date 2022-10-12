@@ -10,11 +10,14 @@ import { useNavigate } from "react-router";
 import axios from "utils/axios";
 
 interface AuthProviderValue {
-  token?: string | null;
-  setToken?: Dispatch<SetStateAction<string | null>>;
+  token: string | null;
+  setToken: Dispatch<SetStateAction<string | null>>;
 }
 
-export const AuthContext = createContext<AuthProviderValue>({});
+export const AuthContext = createContext<AuthProviderValue>({
+  token: null,
+  setToken: () => {},
+});
 
 export const AuthProvider = ({ children }: { children: ReactElement }) => {
   const [token, setToken] = useState<string | null>(null);
