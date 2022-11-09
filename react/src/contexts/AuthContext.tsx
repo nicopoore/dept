@@ -6,7 +6,7 @@ import {
   Dispatch,
   ReactElement,
 } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import axios from "utils/axios";
 
 interface AuthProviderValue {
