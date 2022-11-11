@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "compile": "tsc && node dist/index.js",
+    "compile": "node ./node_modules/typescript/lib/tsc.js && node dist/index.js",
     "dev": "nodemon -e ts  --exec \"npm run compile\"",
     "start": "nodemon -e ts  --exec \"npm run compile\"",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -35,7 +35,6 @@
     "nodemon": "2.0.19",
     "reflect-metadata": "^0.1.13",
     "sqlite3": "^5.0.11",
-    "tsc": "2.0.4",
     "typeorm": "^0.3.8"
   },
   "devDependencies": {
