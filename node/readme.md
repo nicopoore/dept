@@ -1,6 +1,10 @@
 ## Node
 
+This app is dockerize, you just need to run `yarn dev`
+
 We need to have a NodeJs REST API to serve some SpaceX launches data and let a user mark their favorites. The app is setup to use TypeScript, but it allows the use of JS, in fact all is built using just JS. If you prefer to use TypeScript, you can, and feel free to change whatever is needed.
+
+### Tasks
 
 1. We need to fetch data from SpaceX endpoints below, and build an array of launches that looks like the example. NOTE: There's no need to persist the data we get from the remote endpoints nor the response we are generating here. Just hit both endpoints, merge the data to get an output following the format, and return it.
 

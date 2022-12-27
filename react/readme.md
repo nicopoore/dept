@@ -1,5 +1,7 @@
 ## React
 
+This app is dockerize, you just need to run `yarn dev`
+
 The exercise consists of building some missing parts on an application to view Spacex’s latest launches, and being able to add them to a “favorite” list to revisit them later. Change the REACT_APP_BASE_URL on the .env file depending on the backend url.
 
 ### Tasks
