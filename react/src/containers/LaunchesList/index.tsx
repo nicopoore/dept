@@ -14,9 +14,13 @@ export const LaunchesList = () => {
 
   const filterLaunches = () => {
     setCurrentPage(1);
-    // 3
     return setFilteredLaunches(
-      launches.filter((l: Launch) => showAll || l.favorite)
+      launches.filter((l: Launch) => {
+        const matchesSearchText = searchText === "" ||
+          (l.mission_name && l.mission_name.toLowerCase().includes(searchText.toLowerCase()));
+
+        return (showAll || l.favorite) && matchesSearchText;
+      })
     );
   };
 
