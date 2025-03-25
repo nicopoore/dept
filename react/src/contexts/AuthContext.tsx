@@ -16,7 +16,7 @@ interface AuthProviderValue {
 
 export const AuthContext = createContext<AuthProviderValue>({
   token: null,
-  setToken: () => {},
+  setToken: () => { },
 });
 
 export const AuthProvider = ({ children }: { children: ReactElement }) => {
@@ -25,6 +25,7 @@ export const AuthProvider = ({ children }: { children: ReactElement }) => {
 
   useEffect(() => {
     if (token) {
+      // Probably should be Bearer token format
       axios.defaults.headers.common["Authorization"] = token;
       localStorage.setItem("token", token);
       navigate("/");
