@@ -6,4 +6,7 @@ import { getFavorites, addFavorite, removeFavorite } from '../controllers/favori
 export default (router) => {
   router.get('/favorites', auth, getFavorites)
 
+  router.post('/launches/:flight_number/favorite', auth, addFavorite)
+
+  router.delete('/launches/:flight_number/favorite', auth, removeFavorite)
 }
