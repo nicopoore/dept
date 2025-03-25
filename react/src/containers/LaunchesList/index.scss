@@ -1,6 +1,11 @@
 .launches-list-container {
   padding: 20px;
 
+  .launches-list-container-header {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .launches-list {
     display: grid;
     padding-top: 50px;

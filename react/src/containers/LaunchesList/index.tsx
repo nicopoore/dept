@@ -37,7 +37,10 @@ export const LaunchesList = () => {
 
   return (
     <div className="launches-list-container">
-      <Search value={searchText} onChange={setSearchText} />
+      <div className="launches-list-container-header">
+        <p>Total ({launches.length})</p>
+        <Search value={searchText} onChange={setSearchText} />
+      </div>
       <div className="launches-list">
         {filteredLaunches
           .filter(
@@ -49,7 +52,7 @@ export const LaunchesList = () => {
             <LaunchCard
               key={launch.flight_number}
               launch={launch}
-              updateFavorite={() => {}}
+              updateFavorite={() => { }}
             />
           ))}
       </div>
