@@ -1,14 +1,13 @@
-import { useContext } from "react";
 import { Layout } from "components";
-import { AuthContext } from "contexts/AuthContext";
 import { Login } from "pages";
 import { Routes, Route } from "react-router-dom";
 import ModeProvider from "./contexts/ModeContext";
 import { LaunchesList } from "./containers";
 import "./app.scss";
+import { useAuth } from "hooks/useAuth";
 
 export default function App() {
-  const { token } = useContext(AuthContext);
+  const { token } = useAuth();
 
   return (
     <div className="App">
