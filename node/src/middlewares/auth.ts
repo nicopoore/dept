@@ -20,11 +20,6 @@ export const auth = (req, res, next) => {
     return res.status(401).json({ error: 'No token provided' })
   }
 
-  if (!token) {
-    console.error('Invalid token format')
-    return res.status(401).json({ error: 'Invalid token format' })
-  }
-
   try {
     const jwtSecretKey = process.env.JWT_SECRET_KEY
 
