@@ -12,15 +12,18 @@ import axios from "utils/axios";
 interface AuthProviderValue {
   token: string | null;
   setToken: Dispatch<SetStateAction<string | null>>;
+  isAuthenticated: boolean;
 }
 
 export const AuthContext = createContext<AuthProviderValue>({
   token: null,
   setToken: () => { },
+  isAuthenticated: false,
 });
 
 export const AuthProvider = ({ children }: { children: ReactElement }) => {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem("token"));
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,8 +35,14 @@ export const AuthProvider = ({ children }: { children: ReactElement }) => {
     }
   }, [token, navigate]);
 
+  useEffect(() => {
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, [token]);
+
   return (
-    <AuthContext.Provider value={{ token, setToken }}>
+    <AuthContext.Provider value={{ token, setToken, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );

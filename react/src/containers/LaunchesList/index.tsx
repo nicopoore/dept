@@ -6,6 +6,7 @@ import { getLaunches } from "../../api";
 import "./index.scss";
 import { useLocalStorage } from "hooks";
 import { addFavorite, removeFavorite } from "api/favorites";
+import { useAuth } from "hooks/useAuth";
 
 export const LaunchesList = () => {
   const [launches, setLaunches] = useState<Launch[]>([]);
@@ -14,6 +15,8 @@ export const LaunchesList = () => {
   const { showAll } = useContext(ModeContext);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const { toggleFavorite } = useLocalStorage();
+  const { isAuthenticated } = useAuth();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const filterLaunches = () => {
     setCurrentPage(1);
@@ -25,15 +28,6 @@ export const LaunchesList = () => {
         return (showAll || l.favorite) && matchesSearchText;
       })
     );
-  };
-
-  const loadLaunches = async () => {
-    try {
-      const launches = await getLaunches();
-      setLaunches(launches);
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   const handleUpdateFavorite = async (isFavorite: boolean, flightNumber: number) => {
@@ -66,37 +60,57 @@ export const LaunchesList = () => {
   };
 
   useEffect(() => {
+    const loadLaunches = async () => {
+      setIsLoading(true);
+      try {
+        if (isAuthenticated) {
+          const launches = await getLaunches();
+          setLaunches(launches);
+        }
+      } catch (error) {
+        console.error({ error });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     loadLaunches();
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(filterLaunches, [searchText, showAll, launches]);
 
   return (
     <div className="launches-list-container">
       <div className="launches-list-container-header">
-        <p>Total ({launches.length})</p>
+        {isLoading ? <p>Loading...</p> : <p>Total ({launches.length})</p>}
         <Search value={searchText} onChange={setSearchText} />
       </div>
       <div className="launches-list">
-        {filteredLaunches
-          .filter(
-            (_: Launch, i: number) =>
-              i >= CARDS_PER_PAGE * (currentPage - 1) &&
-              i < CARDS_PER_PAGE * currentPage
-          )
-          .map((launch, i) => (
-            <LaunchCard
-              key={launch.flight_number}
-              launch={launch}
-              updateFavorite={handleUpdateFavorite}
-            />
-          ))}
+        {isLoading ? Array(CARDS_PER_PAGE).fill(0).map((_, index) => (
+          <LaunchCard.Skeleton key={`skeleton-${index}`} />
+        )) : (
+          filteredLaunches
+            .filter(
+              (_: Launch, i: number) =>
+                i >= CARDS_PER_PAGE * (currentPage - 1) &&
+                i < CARDS_PER_PAGE * currentPage
+            )
+            .map((launch, i) => (
+              <LaunchCard
+                key={launch.flight_number}
+                launch={launch}
+                updateFavorite={handleUpdateFavorite}
+              />
+            ))
+        )}
       </div>
-      <Pagination
-        value={currentPage}
-        onChange={setCurrentPage}
-        itemsCount={filteredLaunches.length}
-      />
+      {!isLoading && (
+        <Pagination
+          value={currentPage}
+          onChange={setCurrentPage}
+          itemsCount={filteredLaunches.length}
+        />
+      )}
     </div>
   );
 };
