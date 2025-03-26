@@ -1,17 +1,19 @@
 .pagination {
   display: flex;
   align-items: center;
+  gap: 4px;
+  align-self: flex-end;
+  padding: 0 30px 30px;
 
   div {
-
     height: 32px;
+      width: 32px;
     padding: 5px;
     display: flex;
     align-items:center;
     justify-content: center;
-    &.active {
       padding: 0;
-      width: 32px;
+    &.active {
       border-radius: 20px;
       background: white;
       color: black;
@@ -23,9 +25,8 @@
   }
 
   svg {
-    cursor: pointer;
-    
     &:not(.disabled) {
+      cursor: pointer;
       path {
         stroke-opacity: 1;
       }

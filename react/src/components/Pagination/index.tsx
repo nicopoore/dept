@@ -28,19 +28,20 @@ export const Pagination = ({
           </div>
         )
       ),
-    [itemsCount, value]
+    [itemsCount, value, onChange]
   );
 
   return !!itemsCount ? (
     <div className="pagination">
       <ChevronLeftIcon
         className={`chevron-left ${value === 1 ? "disabled" : ""}`}
+        onClick={() => value > 1 && onChange(value - 1)}
       />
       {renderPages}
       <ChevronLeftIcon
-        className={`chevron-right ${
-          value === Math.ceil(itemsCount / CARDS_PER_PAGE) ? "disabled" : ""
-        }`}
+        className={`chevron-right ${value === Math.ceil(itemsCount / CARDS_PER_PAGE) ? "disabled" : ""
+          }`}
+        onClick={() => value < Math.ceil(itemsCount / CARDS_PER_PAGE) && onChange(value + 1)}
       />
     </div>
   ) : null;
