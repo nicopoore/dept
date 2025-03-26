@@ -92,14 +92,13 @@ export const LaunchesList = () => {
           <LaunchCard.Skeleton key={`skeleton-${index}`} />
         )) : (
           filteredLaunches
-            .filter(
-              (_: Launch, i: number) =>
-                i >= CARDS_PER_PAGE * (currentPage - 1) &&
-                i < CARDS_PER_PAGE * currentPage
+            .slice(
+              CARDS_PER_PAGE * (currentPage - 1),
+              CARDS_PER_PAGE * currentPage
             )
             .map((launch, i) => (
               <LaunchCard
-                key={launch.flight_number}
+                key={`${launch.flight_number}-${launch.launch_date_unix}`}
                 launch={launch}
                 updateFavorite={handleUpdateFavorite}
               />

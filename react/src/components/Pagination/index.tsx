@@ -8,7 +8,7 @@ interface PaginationProps {
   onChange: Dispatch<SetStateAction<number>>;
 }
 
-export const CARDS_PER_PAGE: number = 10;
+export const CARDS_PER_PAGE: number = 12;
 
 export const Pagination = ({
   itemsCount,
