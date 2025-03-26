@@ -17,6 +17,7 @@ export const processLaunches = async (userId, launches: Launch[], rockets: Rocke
       mission_name: launch.mission_name,
       mission_patch: launch.links.mission_patch,
       details: launch.details,
+      launch_date_unix: launch.launch_date_unix,
       rocket: rocket
         ? {
             rocket_id: rocket.rocket_id,

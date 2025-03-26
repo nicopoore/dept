@@ -32,7 +32,7 @@ const LaunchCard = ({ launch, updateFavorite }: LaunchCardProps) => {
         ) : null}
         <div className="card-footer">
           <span className="date">
-            {new Date(launch.launch_date_unix).toDateString()}
+            {new Date(launch.launch_date_unix * 1000).toLocaleDateString()}
           </span>
           <Star
             onClick={() => updateFavorite(launch.favorite, launch.flight_number)}
