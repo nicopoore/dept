@@ -4,6 +4,8 @@ import { Launch } from "types";
 import { LaunchCard, Search, Pagination, CARDS_PER_PAGE } from "components";
 import { getLaunches } from "../../api";
 import "./index.scss";
+import { useLocalStorage } from "hooks";
+import { addFavorite, removeFavorite } from "api/favorites";
 
 export const LaunchesList = () => {
   const [launches, setLaunches] = useState<Launch[]>([]);
@@ -11,6 +13,7 @@ export const LaunchesList = () => {
   const [searchText, setSearchText] = useState<string>("");
   const { showAll } = useContext(ModeContext);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const { toggleFavorite } = useLocalStorage();
 
   const filterLaunches = () => {
     setCurrentPage(1);
@@ -30,6 +33,35 @@ export const LaunchesList = () => {
       setLaunches(launches);
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const handleUpdateFavorite = async (isFavorite: boolean, flightNumber: number) => {
+    toggleFavorite(flightNumber);
+    setLaunches(prevLaunches =>
+      prevLaunches.map(launch =>
+        launch.flight_number === flightNumber
+          ? { ...launch, favorite: !launch.favorite }
+          : launch
+      )
+    );
+
+    try {
+      await (isFavorite
+        ? removeFavorite(flightNumber)
+        : addFavorite(flightNumber));
+    } catch (error) {
+      console.error("Failed to update favorite status:", error);
+
+      // Rollback optimistic ui update
+      toggleFavorite(flightNumber);
+      setLaunches(prevLaunches =>
+        prevLaunches.map(launch =>
+          launch.flight_number === flightNumber
+            ? { ...launch, favorite: isFavorite }
+            : launch
+        )
+      );
     }
   };
 
@@ -56,7 +88,7 @@ export const LaunchesList = () => {
             <LaunchCard
               key={launch.flight_number}
               launch={launch}
-              updateFavorite={() => { }}
+              updateFavorite={handleUpdateFavorite}
             />
           ))}
       </div>

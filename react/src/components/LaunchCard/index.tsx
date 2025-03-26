@@ -9,11 +9,6 @@ interface LaunchCardProps {
 }
 
 export const LaunchCard = ({ launch, updateFavorite }: LaunchCardProps) => {
-  const handleClickFavorite = async () => {
-    await (launch.favorite
-      ? removeFavorite(launch.flight_number)
-      : addFavorite(launch.flight_number));
-  };
 
   return (
     <div className="launch-card">
@@ -28,7 +23,7 @@ export const LaunchCard = ({ launch, updateFavorite }: LaunchCardProps) => {
           {new Date(launch.launch_date_unix).toDateString()}
         </span>
         <Star
-          onClick={handleClickFavorite}
+          onClick={() => updateFavorite(launch.favorite, launch.flight_number)}
           className={launch.favorite ? "active" : ""}
         />
       </div>
