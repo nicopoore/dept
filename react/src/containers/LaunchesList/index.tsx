@@ -11,6 +11,9 @@ import { useAuth } from "hooks/useAuth";
 export const LaunchesList = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [launches, setLaunches] = useState<Launch[]>([]);
+
+  // Would've preferred to keep pagination in the backend, but it wouldn't 
+  // be able to handle search via mission_name since the API doesn't support it
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [cardsPerPage, setCardsPerPage] = useState<number>(CARDS_PER_PAGE);
 
