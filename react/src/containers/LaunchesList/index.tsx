@@ -1,4 +1,4 @@
-import { useEffect, useContext, useState, useCallback } from "react";
+import { useEffect, useContext, useState, useCallback, useMemo } from "react";
 import { ModeContext } from "contexts/ModeContext";
 import { Launch } from "types";
 import { LaunchCard, Search, Pagination, CARDS_PER_PAGE } from "components";
@@ -11,7 +11,6 @@ import { useAuth } from "hooks/useAuth";
 export const LaunchesList = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [launches, setLaunches] = useState<Launch[]>([]);
-  const [filteredLaunches, setFilteredLaunches] = useState<Launch[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [cardsPerPage, setCardsPerPage] = useState<number>(CARDS_PER_PAGE);
 
@@ -88,18 +87,19 @@ export const LaunchesList = () => {
     loadLaunches();
   }, [isAuthenticated]);
 
+  const filteredLaunches = useMemo(() => {
+    return launches.filter((l: Launch) => {
+      const matchesSearchText = debouncedSearchText === "" ||
+        (l.mission_name && l.mission_name.toLowerCase().includes(debouncedSearchText.toLowerCase()));
+      const hasDetails = l.details !== null && l.mission_patch !== null;
+
+      return (showAll || l.favorite) && matchesSearchText && hasDetails;
+    });
+  }, [debouncedSearchText, showAll, launches]);
+
   useEffect(() => {
     setCurrentPage(1);
-    return setFilteredLaunches(
-      launches.filter((l: Launch) => {
-        const matchesSearchText = debouncedSearchText === "" ||
-          (l.mission_name && l.mission_name.toLowerCase().includes(debouncedSearchText.toLowerCase()));
-        const hasDetails = l.details !== null && l.mission_patch !== null;
-
-        return (showAll || l.favorite) && matchesSearchText && hasDetails;
-      })
-    );
-  }, [debouncedSearchText, showAll, launches]);
+  }, [debouncedSearchText, showAll]);
 
   return (
     <div className="launches-list-container">
