@@ -4,31 +4,23 @@ import { Launch } from "types";
 import { LaunchCard, Search, Pagination, CARDS_PER_PAGE } from "components";
 import { getLaunches } from "../../api";
 import "./index.scss";
-import { useLocalStorage } from "hooks";
+import { useDebounce, useLocalStorage } from "hooks";
 import { addFavorite, removeFavorite } from "api/favorites";
 import { useAuth } from "hooks/useAuth";
 
 export const LaunchesList = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [launches, setLaunches] = useState<Launch[]>([]);
   const [filteredLaunches, setFilteredLaunches] = useState<Launch[]>([]);
-  const [searchText, setSearchText] = useState<string>("");
-  const { showAll } = useContext(ModeContext);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const { toggleFavorite } = useLocalStorage();
+
+  const [searchText, setSearchText] = useState<string>("");
+  const debouncedSearchText = useDebounce(searchText, 100);
+
   const { isAuthenticated } = useAuth();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { showAll } = useContext(ModeContext);
 
-  const filterLaunches = () => {
-    setCurrentPage(1);
-    return setFilteredLaunches(
-      launches.filter((l: Launch) => {
-        const matchesSearchText = searchText === "" ||
-          (l.mission_name && l.mission_name.toLowerCase().includes(searchText.toLowerCase()));
-
-        return (showAll || l.favorite) && matchesSearchText;
-      })
-    );
-  };
+  const { toggleFavorite } = useLocalStorage();
 
   const handleUpdateFavorite = async (isFavorite: boolean, flightNumber: number) => {
     toggleFavorite(flightNumber);
@@ -77,7 +69,17 @@ export const LaunchesList = () => {
     loadLaunches();
   }, [isAuthenticated]);
 
-  useEffect(filterLaunches, [searchText, showAll, launches]);
+  useEffect(() => {
+    setCurrentPage(1);
+    return setFilteredLaunches(
+      launches.filter((l: Launch) => {
+        const matchesSearchText = debouncedSearchText === "" ||
+          (l.mission_name && l.mission_name.toLowerCase().includes(debouncedSearchText.toLowerCase()));
+
+        return (showAll || l.favorite) && matchesSearchText;
+      })
+    );
+  }, [debouncedSearchText, showAll, launches]);
 
   return (
     <div className="launches-list-container">
