@@ -94,17 +94,18 @@ export const LaunchesList = () => {
           <LaunchCard.Skeleton key={`skeleton-${index}`} />
         )) : (
           filteredLaunches
-            .slice(
-              CARDS_PER_PAGE * (currentPage - 1),
-              CARDS_PER_PAGE * currentPage
-            )
-            .map((launch, i) => (
-              <LaunchCard
-                key={`${launch.flight_number}-${launch.launch_date_unix}`}
-                launch={launch}
-                updateFavorite={handleUpdateFavorite}
-              />
-            ))
+            .map((launch, i) => {
+              if (i >= CARDS_PER_PAGE * (currentPage - 1) && i < currentPage * CARDS_PER_PAGE) {
+                return (
+                  <LaunchCard
+                    key={`${launch.flight_number}-${launch.launch_date_unix}`}
+                    launch={launch}
+                    updateFavorite={handleUpdateFavorite}
+                  />
+                )
+              }
+              return null
+            })
         )}
       </div>
       {!isLoading && (
