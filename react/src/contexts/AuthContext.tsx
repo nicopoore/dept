@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }: { children: ReactElement }) => {
     if (token) {
       // Probably should be Bearer token format
       axios.defaults.headers.common["Authorization"] = token;
+      // Setting in localstorage for simplicity's sake, would be better in cookies for security reasons
       localStorage.setItem("token", token);
     }
   }, [token, navigate]);
