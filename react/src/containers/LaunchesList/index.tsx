@@ -75,8 +75,9 @@ export const LaunchesList = () => {
       launches.filter((l: Launch) => {
         const matchesSearchText = debouncedSearchText === "" ||
           (l.mission_name && l.mission_name.toLowerCase().includes(debouncedSearchText.toLowerCase()));
+        const hasDetails = l.details !== null && l.mission_patch !== null;
 
-        return (showAll || l.favorite) && matchesSearchText;
+        return (showAll || l.favorite) && matchesSearchText && hasDetails;
       })
     );
   }, [debouncedSearchText, showAll, launches]);
@@ -94,6 +95,7 @@ export const LaunchesList = () => {
           <LaunchCard.Skeleton key={`skeleton-${index}`} />
         )) : (
           filteredLaunches
+            .sort((a, b) => b.launch_date_unix - a.launch_date_unix)
             .map((launch, i) => {
               if (i >= CARDS_PER_PAGE * (currentPage - 1) && i < currentPage * CARDS_PER_PAGE) {
                 return (
