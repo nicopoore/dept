@@ -1,5 +1,6 @@
 import { Launch } from "types";
 import { ReactComponent as Star } from "assets/images/star.svg";
+import { useNavigate } from "react-router-dom";
 import "./index.scss";
 
 interface LaunchCardProps {
@@ -19,8 +20,19 @@ const Skeleton: React.FC = () => (
 );
 
 const LaunchCard = ({ launch, updateFavorite }: LaunchCardProps) => {
+  const navigate = useNavigate();
+
+  const handleCardClick = () => {
+    navigate(`/${launch.flight_number}`);
+  };
+
+  const handleStarClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    updateFavorite(launch.favorite, launch.flight_number);
+  };
+
   return (
-    <div className="launch-card">
+    <div className="launch-card" onClick={handleCardClick}>
       <div
         className="patch"
         style={{ backgroundImage: `url(${launch.mission_patch})` }}
@@ -35,7 +47,7 @@ const LaunchCard = ({ launch, updateFavorite }: LaunchCardProps) => {
             {new Date(launch.launch_date_unix * 1000).toLocaleDateString()}
           </span>
           <Star
-            onClick={() => updateFavorite(launch.favorite, launch.flight_number)}
+            onClick={handleStarClick}
             className={launch.favorite ? "active" : ""}
           />
         </div>

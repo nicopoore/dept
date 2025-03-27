@@ -1,5 +1,5 @@
 import { Layout } from "components";
-import { Login } from "pages";
+import { Login, FlightDetails } from "pages";
 import { Routes, Route } from "react-router-dom";
 import ModeProvider from "./contexts/ModeContext";
 import { LaunchesList } from "./containers";
@@ -13,18 +13,26 @@ export default function App() {
     <div className="App">
       <Routes>
         {token ? (
-          <Route
-            path="/"
-            element={
-              <ModeProvider>
-                <Layout>
-                  <LaunchesList />
-                </Layout>
-              </ModeProvider>
-            }
-          />
+          <>
+            <Route
+              path="/"
+              element={
+                <ModeProvider>
+                  <Layout>
+                    <LaunchesList />
+                  </Layout>
+                </ModeProvider>
+              }
+            />
+            <Route
+              path=":flightNumber"
+              element={
+                <FlightDetails />
+              }
+            />
+          </>
         ) : (
-          <Route path="/" element={<Login />} />
+          <Route path="*" element={<Login />} />
         )}
       </Routes>
     </div>

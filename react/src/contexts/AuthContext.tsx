@@ -31,7 +31,6 @@ export const AuthProvider = ({ children }: { children: ReactElement }) => {
       // Probably should be Bearer token format
       axios.defaults.headers.common["Authorization"] = token;
       localStorage.setItem("token", token);
-      navigate("/");
     }
   }, [token, navigate]);
 
