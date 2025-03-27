@@ -106,7 +106,7 @@ export const LaunchesList = () => {
       <div className="launches-list-container-header">
         <Search value={searchText} onChange={setSearchText} />
         <p className="launches-list-container-header-total">
-          {isLoading ? 'Loading...' : `Total (${launches.length})`}
+          {isLoading ? 'Loading...' : `Total (${filteredLaunches.length})`}
         </p>
       </div>
       <div className="launches-list">
