@@ -1,30 +1,58 @@
 .pagination {
   display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
   align-self: flex-end;
-  padding: 0 30px 30px;
+  gap: 3px;
+  padding: 0;
+  flex-wrap: wrap;
+  max-width: 100%;
+  overflow-x: auto;
+  
+  @media (min-width: 576px) {
+    gap: 4px;
+  }
 
   div {
-    height: 32px;
-      width: 32px;
-    padding: 5px;
+    height: 28px;
+    width: 28px;
     display: flex;
-    align-items:center;
+    align-items: center;
     justify-content: center;
     padding: 0;
+    font-size: 13px;
+    
+    @media (min-width: 576px) {
+      height: 32px;
+      width: 32px;
+      font-size: 14px;
+    }
+    
     &.active {
       border-radius: 20px;
       background: white;
       color: black;
     }
 
-    &:not(.active) {
+    &:not(.active):not(.ellipsis) {
       cursor: pointer;
+    }
+    
+    &.ellipsis {
+      opacity: 0.4;
+      width: 8px;
+      cursor: default;
     }
   }
 
   svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    
+    @media (min-width: 576px) {
+    }
+    
     &:not(.disabled) {
       cursor: pointer;
       path {
@@ -33,12 +61,20 @@
     }
 
     &.chevron-left {
-      margin-right: 5px;
+      margin-right: 3px;
+      
+      @media (min-width: 576px) {
+        margin-right: 5px;
+      }
     }
 
     &.chevron-right {
-      margin-left: 5px;
+      margin-left: 3px;
       transform: rotate(180deg);
+      
+      @media (min-width: 576px) {
+        margin-left: 5px;
+      }
     }
   }
 }

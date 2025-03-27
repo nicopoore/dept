@@ -1,4 +1,4 @@
-import { useEffect, useContext, useState } from "react";
+import { useEffect, useContext, useState, useCallback } from "react";
 import { ModeContext } from "contexts/ModeContext";
 import { Launch } from "types";
 import { LaunchCard, Search, Pagination, CARDS_PER_PAGE } from "components";
@@ -13,6 +13,7 @@ export const LaunchesList = () => {
   const [launches, setLaunches] = useState<Launch[]>([]);
   const [filteredLaunches, setFilteredLaunches] = useState<Launch[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [cardsPerPage, setCardsPerPage] = useState<number>(CARDS_PER_PAGE);
 
   const [searchText, setSearchText] = useState<string>("");
   const debouncedSearchText = useDebounce(searchText, 100);
@@ -21,6 +22,24 @@ export const LaunchesList = () => {
   const { showAll } = useContext(ModeContext);
 
   const { toggleFavorite } = useLocalStorage();
+
+  const handleResize = useCallback(() => {
+    const width = window.innerWidth;
+    if (width < 992) {
+      setCardsPerPage(6);
+    } else {
+      setCardsPerPage(CARDS_PER_PAGE);
+    }
+  }, []);
+
+  useEffect(() => {
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [handleResize]);
 
   const handleUpdateFavorite = async (isFavorite: boolean, flightNumber: number) => {
     toggleFavorite(flightNumber);
@@ -85,19 +104,19 @@ export const LaunchesList = () => {
   return (
     <div className="launches-list-container">
       <div className="launches-list-container-header">
+        <Search value={searchText} onChange={setSearchText} />
         <p className="launches-list-container-header-total">
           {isLoading ? 'Loading...' : `Total (${launches.length})`}
         </p>
-        <Search value={searchText} onChange={setSearchText} />
       </div>
       <div className="launches-list">
-        {isLoading ? Array(CARDS_PER_PAGE).fill(0).map((_, index) => (
+        {isLoading ? Array(cardsPerPage).fill(0).map((_, index) => (
           <LaunchCard.Skeleton key={`skeleton-${index}`} />
         )) : (
           filteredLaunches
             .sort((a, b) => b.launch_date_unix - a.launch_date_unix)
             .map((launch, i) => {
-              if (i >= CARDS_PER_PAGE * (currentPage - 1) && i < currentPage * CARDS_PER_PAGE) {
+              if (i >= cardsPerPage * (currentPage - 1) && i < currentPage * cardsPerPage) {
                 return (
                   <LaunchCard
                     key={`${launch.flight_number}-${launch.launch_date_unix}`}
@@ -110,13 +129,16 @@ export const LaunchesList = () => {
             })
         )}
       </div>
-      {!isLoading && (
-        <Pagination
-          value={currentPage}
-          onChange={setCurrentPage}
-          itemsCount={filteredLaunches.length}
-        />
-      )}
+      <div className="launches-list-container-footer">
+        {!isLoading && (
+          <Pagination
+            value={currentPage}
+            onChange={setCurrentPage}
+            itemsCount={filteredLaunches.length}
+            itemsPerPage={cardsPerPage}
+          />
+        )}
+      </div>
     </div>
   );
 };
