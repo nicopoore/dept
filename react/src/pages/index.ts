@@ -1,1 +1,2 @@
-export { Login } from "./Login";
+export { Login } from './Login'
+export { FlightDetails } from './FlightDetails'

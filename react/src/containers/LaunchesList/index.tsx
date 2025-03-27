@@ -1,63 +1,147 @@
-import { useEffect, useContext, useState } from "react";
+import { useEffect, useContext, useState, useCallback, useMemo } from "react";
 import { ModeContext } from "contexts/ModeContext";
 import { Launch } from "types";
 import { LaunchCard, Search, Pagination, CARDS_PER_PAGE } from "components";
 import { getLaunches } from "../../api";
 import "./index.scss";
+import { useDebounce, useLocalStorage } from "hooks";
+import { addFavorite, removeFavorite } from "api/favorites";
+import { useAuth } from "hooks/useAuth";
 
 export const LaunchesList = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [launches, setLaunches] = useState<Launch[]>([]);
-  const [filteredLaunches, setFilteredLaunches] = useState<Launch[]>([]);
-  const [searchText, setSearchText] = useState<string>("");
-  const { showAll } = useContext(ModeContext);
+
+  // Would've preferred to keep pagination in the backend, but it wouldn't 
+  // be able to handle search via mission_name since the API doesn't support it
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [cardsPerPage, setCardsPerPage] = useState<number>(CARDS_PER_PAGE);
 
-  const filterLaunches = () => {
-    setCurrentPage(1);
-    // 3
-    return setFilteredLaunches(
-      launches.filter((l: Launch) => showAll || l.favorite)
+  const [searchText, setSearchText] = useState<string>("");
+  const debouncedSearchText = useDebounce(searchText, 100);
+
+  const { isAuthenticated } = useAuth();
+  const { showAll } = useContext(ModeContext);
+
+  const { toggleFavorite } = useLocalStorage();
+
+  const handleResize = useCallback(() => {
+    const width = window.innerWidth;
+    if (width < 992) {
+      setCardsPerPage(6);
+    } else {
+      setCardsPerPage(CARDS_PER_PAGE);
+    }
+  }, []);
+
+  useEffect(() => {
+    handleResize();
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [handleResize]);
+
+  const handleUpdateFavorite = async (isFavorite: boolean, flightNumber: number) => {
+    toggleFavorite(flightNumber);
+    setLaunches(prevLaunches =>
+      prevLaunches.map(launch =>
+        launch.flight_number === flightNumber
+          ? { ...launch, favorite: !launch.favorite }
+          : launch
+      )
     );
-  };
 
-  const loadLaunches = async () => {
     try {
-      const launches = await getLaunches();
-      setLaunches(launches);
+      await (isFavorite
+        ? removeFavorite(flightNumber)
+        : addFavorite(flightNumber));
     } catch (error) {
-      console.log(error);
+      console.error("Failed to update favorite status:", error);
+
+      // Rollback optimistic ui update
+      toggleFavorite(flightNumber);
+      setLaunches(prevLaunches =>
+        prevLaunches.map(launch =>
+          launch.flight_number === flightNumber
+            ? { ...launch, favorite: isFavorite }
+            : launch
+        )
+      );
     }
   };
 
   useEffect(() => {
-    loadLaunches();
-  }, []);
+    const loadLaunches = async () => {
+      setIsLoading(true);
+      try {
+        if (isAuthenticated) {
+          const launches = await getLaunches();
+          setLaunches(launches);
+        }
+      } catch (error) {
+        console.error({ error });
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  useEffect(filterLaunches, [searchText, showAll, launches]);
+    loadLaunches();
+  }, [isAuthenticated]);
+
+  const filteredLaunches = useMemo(() => {
+    return launches.filter((l: Launch) => {
+      const matchesSearchText = debouncedSearchText === "" ||
+        (l.mission_name && l.mission_name.toLowerCase().includes(debouncedSearchText.toLowerCase()));
+      const hasDetails = l.details !== null && l.mission_patch !== null;
+
+      return (showAll || l.favorite) && matchesSearchText && hasDetails;
+    });
+  }, [debouncedSearchText, showAll, launches]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchText, showAll]);
 
   return (
     <div className="launches-list-container">
-      <Search value={searchText} onChange={setSearchText} />
-      <div className="launches-list">
-        {filteredLaunches
-          .filter(
-            (_: Launch, i: number) =>
-              i >= CARDS_PER_PAGE * (currentPage - 1) &&
-              i < CARDS_PER_PAGE * currentPage
-          )
-          .map((launch, i) => (
-            <LaunchCard
-              key={launch.flight_number}
-              launch={launch}
-              updateFavorite={() => {}}
-            />
-          ))}
+      <div className="launches-list-container-header">
+        <Search value={searchText} onChange={setSearchText} />
+        <p className="launches-list-container-header-total">
+          {isLoading ? 'Loading...' : `Total (${filteredLaunches.length})`}
+        </p>
       </div>
-      <Pagination
-        value={currentPage}
-        onChange={setCurrentPage}
-        itemsCount={filteredLaunches.length}
-      />
+      <div className="launches-list">
+        {isLoading ? Array(cardsPerPage).fill(0).map((_, index) => (
+          <LaunchCard.Skeleton key={`skeleton-${index}`} />
+        )) : (
+          filteredLaunches
+            .sort((a, b) => b.launch_date_unix - a.launch_date_unix)
+            .map((launch, i) => {
+              if (i >= cardsPerPage * (currentPage - 1) && i < currentPage * cardsPerPage) {
+                return (
+                  <LaunchCard
+                    key={`${launch.flight_number}-${launch.launch_date_unix}`}
+                    launch={launch}
+                    updateFavorite={handleUpdateFavorite}
+                  />
+                )
+              }
+              return null
+            })
+        )}
+      </div>
+      <div className="launches-list-container-footer">
+        {!isLoading && (
+          <Pagination
+            value={currentPage}
+            onChange={setCurrentPage}
+            itemsCount={filteredLaunches.length}
+            itemsPerPage={cardsPerPage}
+          />
+        )}
+      </div>
     </div>
   );
 };

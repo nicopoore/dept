@@ -14,7 +14,9 @@ export const Layout = ({ children }: LayoutProps) => {
       <header>
         <img src={logo} alt="SpaceX" />
         <div className="header-bottom">
-          Launches
+          <h1>
+            Launches
+          </h1>
           <div className="tabs">
             <div
               onClick={() => setShowAll(true)}

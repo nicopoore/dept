@@ -7,17 +7,17 @@ export const useLocalStorage = () => {
     JSON.parse(localStorage.getItem(LOCAL_STORAGE_FAVORITE_KEY) || "{}")
   );
 
-  const updateFavorite = (fligh_number: number) => {
+  const toggleFavorite = (flight_number: number) => {
     const newFavs = {
       ...favorites,
-      [fligh_number]: !favorites[fligh_number]
+      [flight_number]: !favorites[flight_number]
     };
     setFavorites(newFavs);
     localStorage.setItem(LOCAL_STORAGE_FAVORITE_KEY, JSON.stringify(newFavs));
   };
 
   return {
-    updateFavorite,
+    toggleFavorite,
     favorites
   };
 };
